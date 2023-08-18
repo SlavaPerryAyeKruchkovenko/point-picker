@@ -12,7 +12,22 @@ module.exports = defineConfig({
             new HtmlWebpackPlugin({
                 template: 'index.html'
             })
-        ]
+        ],
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src'),
+                '@Components': path.resolve(__dirname, 'src/components'),
+                '@Views': path.resolve(__dirname, 'src/views'),
+                '@Store': path.resolve(__dirname, 'src/store'),
+                '@Assets': path.resolve(__dirname, 'src/assets'),
+                '@Router': path.resolve(__dirname, 'src/router'),
+                '@Models': path.resolve(__dirname, 'src/models'),
+                'vue$': 'vue/dist/vue.esm-bundler.js'
+            }
+        },
+        entry: {
+            app: './index.ts'
+        }
     },
     chainWebpack: config => {
         config
@@ -21,13 +36,5 @@ module.exports = defineConfig({
                 args[0].template = 'index.html'
                 return args
             })
-        config.resolve.alias
-            .set('@', path.resolve(__dirname, 'src'))
-            .set('@Components', path.resolve(__dirname, 'src/components'))
-            .set('@Views', path.resolve(__dirname, 'src/views'))
-            .set('@Store', path.resolve(__dirname,'src/store'))
-            .set('@Assets', path.resolve(__dirname,'src/assets'))
-            .set('@Router', path.resolve(__dirname,'src/router'))
-            .set('@Models', path.resolve(__dirname,'src/models'))
     }
 })
