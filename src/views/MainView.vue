@@ -1,7 +1,9 @@
 <template>
   <div class="main-view">
+    <div class="selector-block">
+      <transport-list-component/>
+    </div>
     <map-component/>
-    <transport-list-component class="transport-list"/>
   </div>
 </template>
 
@@ -17,13 +19,15 @@ export default {
 
 <style scoped lang="scss">
 .main-view {
+  overflow: hidden;
   height: 100vh;
   width: 100vw;
-
-  .transport-list {
-    position: absolute;
-    top: 0;
-    left: 0;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 1fr 1fr;
+  .selector-block{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }
 </style>

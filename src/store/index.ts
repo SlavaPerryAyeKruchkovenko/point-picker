@@ -1,14 +1,43 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
+import {transportModule} from "@Store/transportModule";
+import AppState from "@Models/appState";
+import ApiManager from "@/helpers/apiManager";
 
 export default createStore({
-  state: {
-  },
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
+    state: {
+        token: null,
+        login: "userapi",
+        password: "123",
+        UTCOffset: 300
+    } as AppState,
+    getters: {
+        token(state): string | null {
+            return state.token
+        }
+    },
+    mutations: {
+        setToken(state, token: string): void {
+            state.token = token
+        },
+    },
+    modules: {
+        transport: transportModule
+    },
+    actions: {
+        async loginApp({state, commit}) {
+            try {
+                const manager = new ApiManager()
+                const res = await manager.login({
+                    UserName: state.login,
+                    Password: state.password,
+                    UTCOffset: state.UTCOffset,
+                })
+                if (res.status === 200) {
+                    commit('setToken', res.data)
+                }
+            } catch (e) {
+                console.log("login error", e)
+            }
+        }
+    }
 })
