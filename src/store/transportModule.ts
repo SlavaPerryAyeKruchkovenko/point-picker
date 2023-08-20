@@ -9,6 +9,7 @@ import groupBy from "@/helpers/groupBy";
 import findParent from "@/helpers/findParent";
 import fromResGroupToGroup from "@/helpers/converters/fromResGroupToGroup";
 import fromResItemsToTransport from "@/helpers/converters/fromResItemsToTransport";
+import moment from "moment";
 
 export const transportModule: Module<TransportState, AppState> = {
     state: () => ({
@@ -114,19 +115,28 @@ export const transportModule: Module<TransportState, AppState> = {
                 console.log("get all devices error", e)
             }
         },
-        async getLastDayTuckCoordinate({state, commit, rootState}, truckInfo: {
+        async initLastDayTuckCoordinate({state, commit, rootState}, truckInfo: {
             id: string,
             schemaId: string,
         }) {
             try {
                 const manager = new ApiManager();
                 if (rootState.token) {
+                    const now = new Date();
+                    const startDate = new Date();
+                    const endDate = new Date();
+                    startDate.setHours(5);
+                    startDate.setMinutes(0);
+                    endDate.setHours(5);
+                    endDate.setMinutes(0);
+                    endDate.setDate(now.getDate() + 1);
+
                     const res = await manager.getTruckCoordinate({
                         session: rootState.token,
                         schemaID: truckInfo.schemaId,
                         IDs: truckInfo.id,
-                        SD: "",
-                        ED: ""
+                        SD: moment(startDate).format("yyyyMMdd-HHmm"),
+                        ED: moment(endDate).format("yyyyMMdd-HHmm")
                     })
                     console.log(res.data)
                 }
