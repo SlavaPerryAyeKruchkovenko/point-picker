@@ -2,6 +2,7 @@ import {createStore} from 'vuex'
 import {transportModule} from "@Store/transportModule";
 import AppState from "@Models/states/appState";
 import ApiManager from "@/helpers/apiManager";
+import {geofenceModule} from "@Store/geofenceModule";
 
 export default createStore({
     state: {
@@ -25,7 +26,8 @@ export default createStore({
         },
     },
     modules: {
-        transport: transportModule
+        transport: transportModule,
+        geofence: geofenceModule
     },
     actions: {
         async loginApp({state, commit}) {

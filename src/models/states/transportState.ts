@@ -1,6 +1,6 @@
-import Schema from "@Models/schema";
+import SchemaTransports from "@Models/schemaTransports";
 
 type TransportState = {
-    schemas: Schema[]
+    schemas: SchemaTransports[]
 }
 export default TransportState

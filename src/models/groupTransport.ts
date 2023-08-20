@@ -1,10 +1,10 @@
 import Transport from "@Models/transport";
 
-type Group = {
+type GroupTransport = {
     id: string,
     parentId: string | null,
     name: string,
-    groups: Group[],
+    groups: GroupTransport[],
     transports: Transport[]
 }
-export default Group
+export default GroupTransport

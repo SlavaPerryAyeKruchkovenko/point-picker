@@ -1,15 +1,17 @@
 import TransportState from "@Models/states/transportState";
-import Schema from "@Models/schema";
+import SchemaTransports from "@Models/schemaTransports";
 import ApiManager from "@/helpers/apiManager";
 import {Module} from "vuex";
 import AppState from "@Models/states/appState";
 import InitGroupsParam from "@Models/params/initGroupsParam";
-import Group from "@Models/group";
+import GroupTransport from "@Models/groupTransport";
 import groupBy from "@/helpers/groupBy";
 import findParent from "@/helpers/findParent";
 import fromResGroupToGroup from "@/helpers/converters/fromResGroupToGroup";
 import fromResItemsToTransport from "@/helpers/converters/fromResItemsToTransport";
 import moment from "moment";
+import Point from "@Models/point";
+import Transport from "@Models/transport";
 
 export const transportModule: Module<TransportState, AppState> = {
     state: () => ({
@@ -20,7 +22,7 @@ export const transportModule: Module<TransportState, AppState> = {
             return state.schemas
         },
         getSchemasOfTruck: (state: TransportState) => (truckId: string): string | undefined => {
-            const isTruckInGroups = (groups: Group[]) => {
+            const isTruckInGroups = (groups: GroupTransport[]) => {
                 for (const group of groups) {
                     if (group.id === truckId || isTruckInGroups(group.groups)) {
                         return true;
@@ -42,7 +44,7 @@ export const transportModule: Module<TransportState, AppState> = {
         },
     },
     mutations: {
-        initSchemas(state: TransportState, schemas: Schema[]) {
+        initSchemas(state: TransportState, schemas: SchemaTransports[]) {
             state.schemas = schemas
         },
         initGroupsForSchema(state: TransportState, {schemaId, groups}: InitGroupsParam) {
@@ -51,6 +53,31 @@ export const transportModule: Module<TransportState, AppState> = {
                 schema.groups = groups
             }
         },
+        addPointsToTruck(state: TransportState, pointsParam: {
+            points: Point[],
+            transportId: string
+        }) {
+            const getTransportById = (groups: GroupTransport[], id: string): Transport | undefined => {
+                for (const group of groups) {
+                    for (const transport of group.transports) {
+                        if (transport.id === id) {
+                            return transport;
+                        }
+                    }
+                    const transport = getTransportById(group.groups, id);
+                    if (transport) {
+                        return transport;
+                    }
+                }
+                return undefined
+            }
+            state.schemas.forEach(schema => {
+                const transport = getTransportById(schema.groups, pointsParam.transportId)
+                if (transport) {
+                    transport.points = pointsParam.points
+                }
+            })
+        }
     },
     actions: {
         async initSchemas({commit, rootState}) {
@@ -67,7 +94,7 @@ export const transportModule: Module<TransportState, AppState> = {
                                 name: data.Name,
                                 groups: []
                             }
-                        }))
+                        }));
                     }
                 }
 
@@ -88,7 +115,7 @@ export const transportModule: Module<TransportState, AppState> = {
                             const value = res.data
                             const groups = groupBy(value.Groups, x => x.ParentID);
                             const devices = groupBy(value.Items, x => x.ParentID);
-                            const head: Group[] = fromResGroupToGroup((groups.get(null) ?? []).concat(devices.get(null) ?? []));
+                            const head: GroupTransport[] = fromResGroupToGroup((groups.get(null) ?? []).concat(devices.get(null) ?? []));
                             groups.forEach((value, key) => {
                                 if (key) {
                                     const parent = findParent(head, key)
@@ -115,7 +142,7 @@ export const transportModule: Module<TransportState, AppState> = {
                 console.log("get all devices error", e)
             }
         },
-        async initLastDayTuckCoordinate({state, commit, rootState}, truckInfo: {
+        async initLastDayTuckCoordinate({commit, rootState}, truckInfo: {
             id: string,
             schemaId: string,
         }) {
@@ -127,6 +154,7 @@ export const transportModule: Module<TransportState, AppState> = {
                     const endDate = new Date();
                     startDate.setHours(5);
                     startDate.setMinutes(0);
+                    startDate.setDate(now.getDate() - 1)
                     endDate.setHours(5);
                     endDate.setMinutes(0);
                     endDate.setDate(now.getDate() + 1);
@@ -135,10 +163,29 @@ export const transportModule: Module<TransportState, AppState> = {
                         session: rootState.token,
                         schemaID: truckInfo.schemaId,
                         IDs: truckInfo.id,
-                        SD: moment(startDate).format("yyyyMMdd-HHmm"),
-                        ED: moment(endDate).format("yyyyMMdd-HHmm")
+                        SD: moment(startDate).format("yyyyMMDD-HHmm"),
+                        ED: moment(endDate).format("yyyyMMDD-HHmm")
                     })
-                    console.log(res.data)
+                    const data = res.data
+                    Object.keys(data).forEach(key => {
+                        const value = data[key]
+                        if (value.length > 0) {
+                            const points: Point[] = []
+                            value.forEach(point => {
+                                points.push(...point.DT.map((date, i) => {
+                                    return {
+                                        date: date,
+                                        lat: point.Lat[i],
+                                        lng: point.Lng[i]
+                                    }
+                                }));
+                            })
+                            commit("addPointsToTruck", {
+                                points: points,
+                                transportId: key
+                            })
+                        }
+                    })
                 }
             } catch (e) {
                 console.log("get last day coordinate error", e)

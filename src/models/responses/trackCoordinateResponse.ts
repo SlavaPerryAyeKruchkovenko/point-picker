@@ -1,4 +1,8 @@
 type TrackCoordinateResponse = {
-    id: string
+    [key: string]: [{
+        DT: Date[];
+        Lat: number[];
+        Lng: number[];
+    }]
 }
 export default TrackCoordinateResponse
