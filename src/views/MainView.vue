@@ -2,6 +2,7 @@
   <div class="main-view">
     <div class="selector-block">
       <transport-list-component/>
+      <geo-zone-list-component/>
     </div>
     <map-component/>
   </div>
@@ -10,10 +11,11 @@
 <script>
 import MapComponent from "@Components/MapComponent";
 import TransportListComponent from "@Components/TransportListComponent";
+import GeoZoneListComponent from "@Components/GeoZoneListComponent";
 
 export default {
   name: "MainView",
-  components: {TransportListComponent, MapComponent}
+  components: {GeoZoneListComponent, TransportListComponent, MapComponent}
 }
 </script>
 

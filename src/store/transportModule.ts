@@ -17,7 +17,28 @@ export const transportModule: Module<TransportState, AppState> = {
     getters: {
         getSchemas(state: TransportState) {
             return state.schemas
-        }
+        },
+        getSchemasOfTruck: (state: TransportState) => (truckId: string): string | undefined => {
+            const isTruckInGroups = (groups: Group[]) => {
+                for (const group of groups) {
+                    if (group.id === truckId || isTruckInGroups(group.groups)) {
+                        return true;
+                    }
+                    for (const transport of group.transports) {
+                        if (transport.id === truckId) {
+                            return true
+                        }
+                    }
+                }
+                return false;
+            }
+            for (const schema of state.schemas) {
+                if (isTruckInGroups(schema.groups)) {
+                    return schema.id
+                }
+            }
+            return undefined;
+        },
     },
     mutations: {
         initSchemas(state: TransportState, schemas: Schema[]) {
@@ -83,16 +104,34 @@ export const transportModule: Module<TransportState, AppState> = {
                                     }
                                 }
                             })
-                            commit("initGroupsForSchema",{
-                                schemaId:schema.id, groups: head
+                            commit("initGroupsForSchema", {
+                                schemaId: schema.id, groups: head
                             })
-                            console.log(head);
                         }
                     }
                 }
-
             } catch (e) {
                 console.log("get all devices error", e)
+            }
+        },
+        async getLastDayTuckCoordinate({state, commit, rootState}, truckInfo: {
+            id: string,
+            schemaId: string,
+        }) {
+            try {
+                const manager = new ApiManager();
+                if (rootState.token) {
+                    const res = await manager.getTruckCoordinate({
+                        session: rootState.token,
+                        schemaID: truckInfo.schemaId,
+                        IDs: truckInfo.id,
+                        SD: "",
+                        ED: ""
+                    })
+                    console.log(res.data)
+                }
+            } catch (e) {
+                console.log("get last day coordinate error", e)
             }
         }
     },
