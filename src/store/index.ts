@@ -1,6 +1,6 @@
 import {createStore} from 'vuex'
 import {transportModule} from "@Store/transportModule";
-import AppState from "@Models/appState";
+import AppState from "@Models/states/appState";
 import ApiManager from "@/helpers/apiManager";
 
 export default createStore({
@@ -8,15 +8,19 @@ export default createStore({
         token: null,
         login: "userapi",
         password: "123",
-        UTCOffset: 300
+        UTCOffset: 300,
+        date: new Date()
     } as AppState,
     getters: {
-        token(state): string | null {
+        token(state:AppState): string | null {
             return state.token
         }
     },
     mutations: {
-        setToken(state, token: string): void {
+        setCurDate(state:AppState, curDate: Date): void{
+            state.date = curDate
+        },
+        setToken(state:AppState, token: string): void {
             state.token = token
         },
     },
