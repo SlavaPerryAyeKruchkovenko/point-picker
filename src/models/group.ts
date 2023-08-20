@@ -1,8 +1,9 @@
 import Transport from "@Models/transport";
 
 type Group = {
-    id: string
-    parentId: string
+    id: string,
+    parentId: string | null,
+    name: string,
     groups: Group[],
     transports: Transport[]
 }

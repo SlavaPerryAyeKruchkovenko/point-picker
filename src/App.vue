@@ -5,11 +5,11 @@
 import {mapActions} from "vuex"
 
 export default {
-  created() {
-    this.loginApp();
+  async created() {
+    await this.loginApp();
   },
-  methods: mapActions(["loginApp"])
+  methods: {
+    ...mapActions(["loginApp"])
+  }
 }
 </script>
-<style lang="scss">
-</style>

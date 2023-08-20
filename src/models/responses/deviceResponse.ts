@@ -2,14 +2,14 @@ type DeviceResponse = {
     ID: string,
     Groups: [{
         ID: string,
-        ParentId: string | null,
+        ParentID: string | null,
         Name: string
     }],
     Items: [
         {
             ID: string,
             ParentID: string | null,
-            Name: string
+            Name: string,
         }
     ]
 }

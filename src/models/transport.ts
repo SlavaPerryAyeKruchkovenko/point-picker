@@ -1,6 +1,6 @@
 type Transport = {
     id:string,
-    parentID:string,
+    parentID:string | null,
     name: string,
     points:[]
 }
