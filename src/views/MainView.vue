@@ -1,10 +1,10 @@
 <template>
   <div class="main-view">
     <div class="selector-block">
-      <transport-list-component/>
-      <geo-zone-list-component/>
+      <transport-list-component class="data-list"/>
+      <geo-zone-list-component class="data-list"/>
     </div>
-    <map-component/>
+    <map-component class="map"/>
   </div>
 </template>
 
@@ -24,12 +24,24 @@ export default {
   overflow: hidden;
   height: 100vh;
   width: 100vw;
-  display: grid;
-  grid-template-columns: 100%;
-  grid-template-rows: 1fr 1fr;
-  .selector-block{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+
+  .selector-block {
+    height: 50%;
+    width: 100%;
+
+    .data-list {
+      background: #f6f8fa;
+      max-width: 50%;
+      max-height: 100%;
+      overflow: auto;
+    }
+  }
+
+  .map {
+    width: 100%;
+    height: 50%;
   }
 }
 </style>
