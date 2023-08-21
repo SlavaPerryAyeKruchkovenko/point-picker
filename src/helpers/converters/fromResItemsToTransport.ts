@@ -1,4 +1,4 @@
-import Transport from "@Models/transport";
+import Transport from "@Models/transport/transport";
 
 const fromResItemsToTransport = (value: {ID: string, ParentID: string | null, Name: string}[]):Transport[] => {
     return value.map(value => {

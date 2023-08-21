@@ -1,6 +1,7 @@
-import SchemaGeofence from "@Models/schemaGeofence";
+import Schema from "@Models/schema";
+import Geofence from "@Models/geofence/geofence";
 
 type GeofenceState = {
-    schemas: SchemaGeofence[]
+    schemas: Schema<Geofence>[]
 }
 export default GeofenceState

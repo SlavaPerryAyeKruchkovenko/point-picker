@@ -1,6 +1,6 @@
-import GroupTransport from "@Models/groupTransport";
+import Group from "@Models/group";
 
-const findParent = (groups: GroupTransport[], parentId: string): GroupTransport | undefined => {
+const findParent = <T>(groups: Group<T>[], parentId: string): Group<T> | undefined => {
     if (groups.length > 0) {
         const parent = groups.find(x => x.id === parentId)
         if (parent) {

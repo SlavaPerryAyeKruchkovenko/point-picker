@@ -1,6 +1,6 @@
-import GroupTransport from "@Models/groupTransport";
+import Group from "@Models/group";
 
-type InitGroupsParam = {
-    schemaId:string, groups: GroupTransport[]
+type InitGroupsParam<T> = {
+    schemaId: string, groups: Group<T>[]
 }
 export default InitGroupsParam
