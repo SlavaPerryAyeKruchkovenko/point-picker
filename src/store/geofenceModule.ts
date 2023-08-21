@@ -16,6 +16,7 @@ import Circle from "@Models/geofence/circle";
 import Polygon from "@Models/geofence/polygon";
 import Rectangle from "@Models/geofence/rectangle";
 import RectParam from "@Models/params/rectParam";
+import findGeofenceInGroups from "@/helpers/findFunctions/findGeofenceInGroups";
 
 export const geofenceModule: Module<GeofenceState, AppState> = {
     state: () => ({
@@ -26,21 +27,8 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
             return state.schemas
         },
         getSchemasOfGeofence: (state: GeofenceState) => (geofenceId: string): string | undefined => {
-            const isTruckInGroups = (groups: Group<Geofence>[]) => {
-                for (const group of groups) {
-                    if (group.id === geofenceId || isTruckInGroups(group.groups)) {
-                        return true;
-                    }
-                    for (const transport of group.data) {
-                        if (transport.id === geofenceId) {
-                            return true
-                        }
-                    }
-                }
-                return false;
-            }
             for (const schema of state.schemas) {
-                if (isTruckInGroups(schema.groups)) {
+                if (findGeofenceInGroups(schema.groups, geofenceId)) {
                     return schema.id
                 }
             }
@@ -58,25 +46,30 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
             }
         },
         initRectForGeofence(state: GeofenceState, {rect, geofenceId}: RectParam) {
-            const getGeofenceById = (groups: Group<Geofence>[], id: string): Geofence | undefined => {
-                for (const group of groups) {
-                    for (const geofence of group.data) {
-                        if (geofence.id === id) {
-                            return geofence;
-                        }
-                    }
-                    const geofence = getGeofenceById(group.groups, id);
-                    if (geofence) {
-                        return geofence;
-                    }
+            state.schemas.forEach(schema => {
+                const geofence = findGeofenceInGroups(schema.groups, geofenceId) as Geofence;
+                if (geofence) {
+                    geofence.rect = rect;
                 }
-                return undefined
+            })
+        },
+        removeRect(state: GeofenceState, geofenceId: string) {
+            const removeGroupRect = (group: Group<Geofence>) => {
+                group.data.forEach(geofence => {
+                    geofence.rect = undefined
+                })
+                group.groups.forEach(group => {
+                    removeGroupRect(group)
+                })
             }
             state.schemas.forEach(schema => {
-                const geofence = getGeofenceById(schema.groups, geofenceId);
-                if (geofence) {
-                    console.log(geofence)
-                    geofence.rect = rect;
+                const object = findGeofenceInGroups(schema.groups, geofenceId);
+                const geofence = object as Geofence;
+                const group = object as Group<Geofence>
+                if ((geofence as Geofence).rect) {
+                    geofence.rect = undefined;
+                } else if (group.data) {
+                    removeGroupRect(group)
                 }
             })
         }
@@ -179,6 +172,9 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
             } catch (e) {
                 console.log("get last day coordinate error", e)
             }
+        },
+        removeGeofenceRect({commit}, geofenceId: string) {
+            commit("removeRect", geofenceId)
         }
     },
     namespaced: true

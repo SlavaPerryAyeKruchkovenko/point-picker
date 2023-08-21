@@ -22,6 +22,7 @@ module.exports = defineConfig({
                 '@Assets': path.resolve(__dirname, 'src/assets'),
                 '@Router': path.resolve(__dirname, 'src/router'),
                 '@Models': path.resolve(__dirname, 'src/models'),
+                '@Helpers': path.resolve(__dirname, 'src/helpers'),
                 'vue$': 'vue/dist/vue.esm-bundler.js'
             }
         },

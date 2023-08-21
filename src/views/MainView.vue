@@ -11,7 +11,7 @@
 <script>
 import MapComponent from "@Components/MapComponent";
 import TransportListComponent from "@Components/TransportListComponent";
-import GeoZoneListComponent from "@Components/GeoZoneListComponent";
+import GeoZoneListComponent from "@Components/GeofenceListComponent";
 
 export default {
   name: "MainView",

@@ -38,7 +38,7 @@ export default {
     ])
   },
   methods: {
-    ...mapActions("geofence", ["initSchemas", "initGeofence", "initGeofenceCoordinate"])
+    ...mapActions("geofence", ["initSchemas", "initGeofence"])
   },
   name: "GeoZoneListComponent"
 }
