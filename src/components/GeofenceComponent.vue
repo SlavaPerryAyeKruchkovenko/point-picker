@@ -7,27 +7,13 @@
 </template>
 
 <script lang="ts">
-import CheckboxState from "@/models/checkboxState";
+import CheckboxState from "@Models/checkboxState";
 import Geofence from "@Models/geofence/geofence";
 import ThreeStateCheckbox from "@Components/ThreeStateCheckbox.vue";
 import {defineComponent, PropType} from "vue";
 import {mapActions, mapGetters} from "vuex";
 
 export default defineComponent({
-  data() {
-    return {
-      checkboxState: CheckboxState.unchecked
-    }
-  },
-  watch: {
-    rect(newRect) {
-      if (newRect) {
-        this.checkboxState = CheckboxState.checked;
-      } else {
-        this.checkboxState = CheckboxState.unchecked
-      }
-    }
-  },
   components: {ThreeStateCheckbox},
   name: "GeofenceComponent",
   props: {
@@ -37,8 +23,12 @@ export default defineComponent({
     }
   },
   computed: {
-    rect() {
-      return this.geofence.rect
+    checkboxState() {
+      if (this.geofence.rect) {
+        return CheckboxState.checked;
+      } else {
+        return CheckboxState.unchecked
+      }
     },
     ...mapGetters("geofence", [
       'getSchemasOfGeofence'

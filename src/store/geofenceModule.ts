@@ -45,7 +45,7 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
                 schema.groups = groups
             }
         },
-        initRectForGeofence(state: GeofenceState, {rect, geofenceId}: RectParam) {
+        addRectForGeofence(state: GeofenceState, {rect, geofenceId}: RectParam) {
             state.schemas.forEach(schema => {
                 const geofence = findGeofenceInGroups(schema.groups, geofenceId) as Geofence;
                 if (geofence) {
@@ -163,7 +163,7 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
                                 }
                             }))
                         }
-                        commit("initRectForGeofence", {
+                        commit("addRectForGeofence", {
                             rect: rect,
                             geofenceId: key
                         })

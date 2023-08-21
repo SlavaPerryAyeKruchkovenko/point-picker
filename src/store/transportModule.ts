@@ -14,6 +14,7 @@ import Group from "@Models/group";
 import Schema from "@Models/schema";
 import getSchemaFromApi from "@/helpers/apiFunctions/getSchemaFromApi";
 import PointsParam from "@Models/params/pointsParam";
+import findTruckInGroup from "@Helpers/findFunctions/findTruckInGroup";
 
 export const transportModule: Module<TransportState, AppState> = {
     state: () => ({
@@ -24,21 +25,8 @@ export const transportModule: Module<TransportState, AppState> = {
             return state.schemas
         },
         getSchemasOfTruck: (state: TransportState) => (truckId: string): string | undefined => {
-            const isTruckInGroups = (groups: Group<Transport>[]) => {
-                for (const group of groups) {
-                    if (group.id === truckId || isTruckInGroups(group.groups)) {
-                        return true;
-                    }
-                    for (const transport of group.data) {
-                        if (transport.id === truckId) {
-                            return true
-                        }
-                    }
-                }
-                return false;
-            }
             for (const schema of state.schemas) {
-                if (isTruckInGroups(schema.groups)) {
+                if (findTruckInGroup(schema.groups, truckId)) {
                     return schema.id
                 }
             }
@@ -56,24 +44,31 @@ export const transportModule: Module<TransportState, AppState> = {
             }
         },
         addPointsToTruck(state: TransportState, pointsParam: PointsParam) {
-            const getTransportById = (groups: Group<Transport>[], id: string): Transport | undefined => {
-                for (const group of groups) {
-                    for (const transport of group.data) {
-                        if (transport.id === id) {
-                            return transport;
-                        }
-                    }
-                    const transport = getTransportById(group.groups, id);
-                    if (transport) {
-                        return transport;
-                    }
-                }
-                return undefined
-            }
             state.schemas.forEach(schema => {
-                const transport = getTransportById(schema.groups, pointsParam.transportId);
+                const object = findTruckInGroup(schema.groups, pointsParam.transportId);
+                const transport = object as Transport
                 if (transport) {
                     transport.points = pointsParam.points;
+                }
+            })
+        },
+        removePoints(state: TransportState, transportId: string) {
+            const removeGroupRect = (group: Group<Transport>) => {
+                group.data.forEach(geofence => {
+                    geofence.points = undefined
+                })
+                group.groups.forEach(group => {
+                    removeGroupRect(group)
+                })
+            }
+            state.schemas.forEach(schema => {
+                const object = findTruckInGroup(schema.groups, transportId);
+                const geofence = object as Transport;
+                const group = object as Group<Transport>
+                if ((geofence as Transport).points) {
+                    geofence.points = undefined;
+                } else if (group.data) {
+                    removeGroupRect(group)
                 }
             })
         }
@@ -155,29 +150,31 @@ export const transportModule: Module<TransportState, AppState> = {
                         ED: moment(endDate).format("yyyyMMDD-HHmm")
                     })
                     const data = res.data
+
                     Object.keys(data).forEach(key => {
                         const value = data[key]
-                        if (value.length > 0) {
-                            const points: Point[] = []
-                            value.forEach(point => {
-                                points.push(...point.DT.map((date, i) => {
-                                    return {
-                                        date: date,
-                                        lat: point.Lat[i],
-                                        lng: point.Lng[i]
-                                    }
-                                }));
-                            })
-                            commit("addPointsToTruck", {
-                                points: points,
-                                transportId: key
-                            })
-                        }
+                        const points: Point[] = []
+                        value.forEach(point => {
+                            points.push(...point.DT.map((date, i) => {
+                                return {
+                                    date: date,
+                                    lat: point.Lat[i],
+                                    lng: point.Lng[i]
+                                }
+                            }));
+                        })
+                        commit("addPointsToTruck", {
+                            points: points,
+                            transportId: key
+                        })
                     })
                 }
             } catch (e) {
                 console.log("get last day coordinate error", e)
             }
+        },
+        removeTransportPoints({commit}, transportId: string) {
+            commit("removePoints", transportId)
         }
     },
     namespaced: true

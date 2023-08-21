@@ -4,6 +4,6 @@ type Transport = {
     id:string,
     parentID:string | null,
     name: string,
-    points: Point[]
+    points: Point[] | undefined
 }
 export default Transport

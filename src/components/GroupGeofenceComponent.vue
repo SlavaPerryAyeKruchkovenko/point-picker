@@ -1,7 +1,7 @@
 <template>
   <li class="group">
     <div class="group-title">
-      <three-state-checkbox :state="checkboxState" class="checkbox" @click="viewAllGeofence"/>
+      <three-state-checkbox :state="checkboxState" class="checkbox" @click="toggleAllGeofence"/>
       <vue-feather type="folder" size="24" fill="yellow"></vue-feather>
       <span class="group-title-name">{{ group.name }}</span>
     </div>
@@ -47,7 +47,7 @@ export default {
     ])
   },
   methods: {
-    async viewAllGeofence() {
+    async toggleAllGeofence() {
       if (this.checkboxState === CheckboxState.unchecked || this.checkboxState === CheckboxState.indeterminate) {
         const schemaId = this.getSchemasOfGeofence(this.group.id);
         if (schemaId) {
