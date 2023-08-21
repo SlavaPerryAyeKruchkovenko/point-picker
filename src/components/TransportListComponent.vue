@@ -6,7 +6,7 @@
         <span class="schema-name">{{ schema.name }}</span>
       </div>
       <ul class="schema-groups">
-        <group-component v-for="group in schema.groups" :group="group" :key="group.id"/>
+        <group-transport-component v-for="group in schema.groups" :group="group" :key="group.id"/>
       </ul>
     </li>
   </ul>
@@ -14,10 +14,10 @@
 
 <script>
 import {mapActions, mapGetters} from "vuex";
-import GroupComponent from "@Components/GroupComponent";
+import GroupTransportComponent from "@Components/GroupTransportComponent";
 
 export default {
-  components: {GroupComponent},
+  components: {GroupTransportComponent},
   watch: {
     token: {
       async handler() {
@@ -58,7 +58,7 @@ export default {
   width: 100%;
   height: 100%;
   overflow: auto;
-  outline: 2px solid black;
+  border: 2px solid black;
 
   .schema {
     width: 100%;

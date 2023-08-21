@@ -28,6 +28,7 @@ export default {
   flex-direction: column;
 
   .selector-block {
+    display: flex;
     height: 50%;
     width: 100%;
 

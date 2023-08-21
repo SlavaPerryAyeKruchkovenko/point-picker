@@ -6,7 +6,7 @@
       <span class="group-title-name">{{ group.name }}</span>
     </div>
     <ul class="s-groups">
-      <group-component v-for="s_group in group.groups" :group="s_group" :key="s_group.id"/>
+      <group-transport-component v-for="s_group in group.groups" :group="s_group" :key="s_group.id"/>
       <transport-component v-for="transport in group.data" :transport="transport" :key="transport.id"/>
     </ul>
   </li>
@@ -17,7 +17,7 @@
 import TransportComponent from "@Components/TransportComponent";
 
 export default {
-  name: "GroupComponent",
+  name: "GroupTransportComponent",
   components: {TransportComponent},
   props: {
     group: {

@@ -1,8 +1,8 @@
 <template>
-  <div class="transport">
+  <div class="geofence">
     <input type="checkbox"/>
-    <vue-feather type="truck" size="24" fill="blue"></vue-feather>
-    <span class="transport-name">{{ transport.name }}</span>
+    <vue-feather type="target" size="24" fill="red"></vue-feather>
+    <span class="geofence-name">{{ geofence.name }}</span>
   </div>
 </template>
 
@@ -10,23 +10,26 @@
 import Transport from "../models/transport/transport";
 
 export default {
-  name: "TransportComponent",
+  name: "GeofenceComponent",
   props: {
-    transport: {
+    geofence: {
       type: Transport,
       required: true
     }
+  },
+  methods:{
+
   }
 }
 </script>
 
 <style scoped lang="scss">
-.transport {
+.geofence {
   display: flex;
   align-items: center;
   margin-top: 6px;
 
-  .transport-name {
+  .geofence-name {
     margin-left: 6px;
     font-size: 18px;
     font-family: "Ubuntu", sans-serif;
