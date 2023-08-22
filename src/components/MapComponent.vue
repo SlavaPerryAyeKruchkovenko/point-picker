@@ -47,11 +47,12 @@ export default {
               this.map.fitBounds(mapPolygon.getBounds());
             } else if (rect instanceof Circle) {
               const circle = rect as Circle
-              const mapCircle = L.circle(circle.coordinate, circle.radius, {color: "red"}).addTo(this.rectLayer);
+              const mapCircle = L.circle([circle.coordinate.lat, circle.coordinate.lng], circle.radius, {color: "red"}).addTo(this.rectLayer);
               this.map.fitBounds(mapCircle.getBounds());
             } else if (rect instanceof Rectangle) {
               const rectangle = rect as Rectangle
-              const bounds = rectangle.coordinates.map(x => bounds.extend(L.latLng(x.lat, x.lng)));
+              console.log(rectangle)
+              const bounds = L.latLngBounds(rectangle.coordinates.map(x => L.latLng(x.lat, x.lng)));
               const mapRect = L.rectangle(bounds, {color: "blue", weight: 1}).addTo(this.rectLayer);
               this.map.fitBounds(mapRect.getBounds());
             }
