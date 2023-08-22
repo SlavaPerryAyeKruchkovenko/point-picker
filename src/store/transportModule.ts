@@ -21,7 +21,7 @@ export const transportModule: Module<TransportState, AppState> = {
         schemas: [],
     }) as TransportState,
     getters: {
-        getSchemas(state: TransportState) {
+        getSchemas: (state: TransportState) => {
             return state.schemas
         },
         getSchemasOfTruck: (state: TransportState) => (truckId: string): string | undefined => {
@@ -32,6 +32,21 @@ export const transportModule: Module<TransportState, AppState> = {
             }
             return undefined;
         },
+        getAllPoints: (state: TransportState) => {
+            const getPointFromGroups = (groups: Group<Transport>[]): Point[][] => {
+                let points = []
+                groups.forEach(group => {
+                    points = points.concat(group.data.filter(x => x.points && x.points.length > 0).map(x => x.points));
+                    points = points.concat(getPointFromGroups(group.groups));
+                })
+                return points
+            }
+            let points: Point[][] = []
+            state.schemas.forEach(schema => {
+                points = points.concat(getPointFromGroups(schema.groups));
+            })
+            return points;
+        }
     },
     mutations: {
         initSchemas(state: TransportState, schemas: Schema<Transport>[]) {

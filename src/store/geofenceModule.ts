@@ -23,7 +23,7 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
         schemas: [],
     }) as GeofenceState,
     getters: {
-        getSchemas(state: GeofenceState) {
+        getSchemas: (state: GeofenceState) => {
             return state.schemas
         },
         getSchemasOfGeofence: (state: GeofenceState) => (geofenceId: string): string | undefined => {
@@ -34,6 +34,21 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
             }
             return undefined;
         },
+        getAllRect: (state: GeofenceState) => {
+            const getPointFromGroups = (groups:Group<Geofence>[]): Rect[] =>{
+                let rects = []
+                groups.forEach(group=>{
+                    rects = rects.concat(group.data.filter(x=>x.rect).map(x => x.rect));
+                    rects = rects.concat(getPointFromGroups(group.groups))
+                })
+                return rects
+            }
+            let rects: Rect[] = []
+            state.schemas.forEach(schema=>{
+                rects = rects.concat(getPointFromGroups(schema.groups))
+            })
+            return rects;
+        }
     },
     mutations: {
         initSchemas(state: GeofenceState, schemas: Schema<Geofence>[]) {
@@ -126,7 +141,7 @@ export const geofenceModule: Module<GeofenceState, AppState> = {
                 console.log("get all geofences error", e)
             }
         },
-        async initGeofenceCoordinate({commit, rootState}, geofenceInfo: {
+        async addGeofenceCoordinate({commit, rootState}, geofenceInfo: {
             schemaId: string,
             id: string
         }) {

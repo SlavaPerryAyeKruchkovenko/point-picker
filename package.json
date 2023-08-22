@@ -21,6 +21,7 @@
     "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.3",
     "@types/vue-feather-icons": "^5.0.4",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",

@@ -39,7 +39,7 @@ export default defineComponent({
       if (this.checkboxState === CheckboxState.unchecked) {
         const schemaId = this.getSchemasOfGeofence(this.geofence.id);
         if (schemaId) {
-          await this.initGeofenceCoordinate({
+          await this.addGeofenceCoordinate({
             schemaId: schemaId,
             id: this.geofence.id
           })
@@ -48,7 +48,7 @@ export default defineComponent({
         this.removeGeofenceRect(this.geofence.id);
       }
     },
-    ...mapActions("geofence", ["initGeofenceCoordinate", "removeGeofenceRect"])
+    ...mapActions("geofence", ["addGeofenceCoordinate", "removeGeofenceRect"])
   }
 })
 </script>
