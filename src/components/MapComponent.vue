@@ -51,7 +51,6 @@ export default {
               this.map.fitBounds(mapCircle.getBounds());
             } else if (rect instanceof Rectangle) {
               const rectangle = rect as Rectangle
-              console.log(rectangle)
               const bounds = L.latLngBounds(rectangle.coordinates.map(x => L.latLng(x.lat, x.lng)));
               const mapRect = L.rectangle(bounds, {color: "blue", weight: 1}).addTo(this.rectLayer);
               this.map.fitBounds(mapRect.getBounds());
