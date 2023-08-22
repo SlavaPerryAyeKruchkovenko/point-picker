@@ -11,6 +11,7 @@ import Point from "@Models/point";
 import Polygon from "@Models/geofence/polygon";
 import Circle from "@Models/geofence/circle";
 import Rectangle from "@Models/geofence/rectangle";
+import moment from "moment";
 
 export default {
   name: "MapComponent",
@@ -18,13 +19,14 @@ export default {
     return {
       map: undefined,
       rectLayer: undefined,
+      pointsLayer: undefined,
     }
   },
   mounted() {
-    this.map = L.map('map').setView([35.35, 52], 10);
+    this.map = L.map('map').setView([55.15402, 61.42915], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
-      maxZoom: 18,
+      maxZoom: 24,
       tileSize: 512,
       zoomOffset: -1,
     }).addTo(this.map);
@@ -34,9 +36,10 @@ export default {
       handler(newRects: Rect[]) {
         if (this.map) {
           if (this.rectLayer) {
-            this.rectLayer.clearLayers()
+            this.rectLayer.clearLayers();
+          } else {
+            this.rectLayer = L.layerGroup().addTo(this.map);
           }
-          this.rectLayer = L.layerGroup().addTo(this.map);
           newRects.forEach(rect => {
             if (rect instanceof Polygon) {
               const polygon = rect as Polygon
@@ -58,7 +61,24 @@ export default {
     },
     points: {
       handler(newPoints: Point[][]) {
-        /*console.log(newPoints)*/
+        if (this.map) {
+          if (this.pointsLayer) {
+            this.pointsLayer.clearLayers();
+          } else {
+            this.pointsLayer = L.layerGroup().addTo(this.map);
+          }
+          newPoints.forEach(point => {
+            point.forEach(point => {
+              const marker = L.marker([point.lat, point.lng], {
+                icon: this.customIcon,
+              }).addTo(this.pointsLayer);
+              marker.on('click', () => {
+                marker.bindPopup(`Время прибытие: ${moment(point.date).format("DD.MM.yyyy-hh:mm")}`).openPopup();
+              });
+            })
+            this.map.fitBounds(point.map(x => [x.lat, x.lng]));
+          })
+        }
       },
       immediate: false
     }
@@ -75,6 +95,13 @@ export default {
     },
     points() {
       return this.getAllPoints
+    },
+    customIcon() {
+      return L.icon({
+        iconUrl: 'flags.png',
+        iconSize: [24, 24],
+        // Другие опции иконки (необязательно)
+      });
     }
   },
 }
